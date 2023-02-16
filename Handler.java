@@ -22,7 +22,8 @@ public class Handler implements Runnable{
     }
     @Override
     public void run () {
-        String request;
+		String request;
+        // String request = "GET http://www.aastu.edu.et/index.html HTTP/1.0\r\n";
         try{
             request = toClient.readLine();
         }
@@ -30,24 +31,42 @@ public class Handler implements Runnable{
             System.out.println("error minamn : "+e.getMessage());
             return;
         }
-        Pattern pattern = Pattern.compile("GET http://.*?:(\\d+)/(.*?) HTTP/1.0\r\n");
-        // Pattern pattern = Pattern.compile("^(\\w+)\\s+http://(\\S+):(\\d+)\\s+(\\S+)$");
-        Matcher matcher = pattern.matcher(request);
-         String host = "";
-         int port = 80;
-        if (matcher.find()) {
-            port = Integer.parseInt(matcher.group(1));
-            String path = matcher.group(2);
-            int startIndex = request.indexOf("http://") + 7;
-            int endIndex = request.indexOf(":80/");
-            host = request.substring(startIndex, endIndex);
-            System.out.println("Port: " + port);
-            System.out.println("Path: " + path);
-            System.out.println("host : "+host);
-        } else {
-            System.out.println("Could not parse the request.");
-        }
-        try (Socket socket = new Socket(host, port)) {
+        // Pattern pattern = Pattern.compile("GET http://.*?:(\\d+)/(.*?) HTTP/1.0\r\n");
+        // // Pattern pattern = Pattern.compile("^(\\w+)\\s+http://(\\S+):(\\d+)\\s+(\\S+)$");
+        // Matcher matcher = pattern.matcher(request);
+        //  String host = "";
+        //  int port = 80;
+        // if (matcher.find()) {
+        //     port = Integer.parseInt(matcher.group(1));
+        //     String path = matcher.group(2);
+        //     int startIndex = request.indexOf("http://") + 7;
+        //     int endIndex = request.indexOf(":80/");
+        //     host = request.substring(startIndex, endIndex);
+        //     System.out.println("Port: " + port);
+        //     System.out.println("Path: " + path);
+        //     System.out.println("host : "+host);
+        // } else {
+        //     System.out.println("Could not parse the request.");
+        // }
+		String[] components = request.split("\\s+");
+			String requestType = components[0];
+			String requestRoute = components[1];
+			String protocolVersion = components[2];
+
+			// Extract the host from the request route
+			int hostStart = requestRoute.indexOf("://") + 3;
+			int hostEnd = requestRoute.indexOf("/", hostStart);
+			String host = requestRoute.substring(hostStart, hostEnd);
+
+			// Extract the request route from the request route
+			int routeStart = requestRoute.indexOf("/", hostEnd);
+			String route = requestRoute.substring(routeStart);
+
+			// Print the parsed components
+			System.out.println("Request Type: " + requestType);
+			System.out.println("Host: " + host);
+			System.out.println("Request Route: " + route);
+        try (Socket socket = new Socket(host, 80)) {
             OutputStream output = socket.getOutputStream();
 			System.out.println("Are you getting here?");
             InputStream input = socket.getInputStream();
