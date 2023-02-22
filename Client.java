@@ -20,8 +20,6 @@ public class Client implements Runnable{
             // Create the Server Socket for the Proxy 
             serverSocket = new ServerSocket(port);
 
-            // Set the timeout
-            //serverSocket.setSoTimeout(100000);	// debug
             System.out.println("Waiting for client on port " + serverSocket.getLocalPort() + "..");
             running = true;
         } 
@@ -39,8 +37,6 @@ public class Client implements Runnable{
         }
     }
     public static void main (String args []) {
-        // Jumper myProxy = new Jumper(8085);
-        // myProxy.listen();
         Client myProxy = new Client(8085);
         myProxy.listen();
 
@@ -52,6 +48,7 @@ public class Client implements Runnable{
     public void listen(){
  
         while(running){
+
             try {
                 // serverSocket.accpet() Blocks until a connection is made
                 Socket socket = serverSocket.accept();
@@ -59,8 +56,6 @@ public class Client implements Runnable{
                 // Create new Thread and pass it Runnable RequestHandler
                 Thread thread = new Thread(new Handler(socket));
                 
-                // Key a reference to each thread so they can be joined later if necessary
-                //servicingThreads.add(thread);
                 
                 thread.start();	
             } catch (SocketException e) {
